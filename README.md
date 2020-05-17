@@ -12,8 +12,8 @@
 ````
 
 # to run the app:
-* needs supervisor to be installed
-
 ````
     npm start
 ````
+
+* needs supervisor to be installed
