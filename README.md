@@ -1,4 +1,4 @@
-# db schema
+# create the DB, and it's user
 ```
     CREATE DATABASE `directories-db` CHARACTER SET utf8 COLLATE utf8_general_ci;
     CREATE USER `root`@`localhost` IDENTIFIED BY '';
