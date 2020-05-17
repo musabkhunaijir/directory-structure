@@ -125,6 +125,18 @@ async function addSubDirectory(req, response) {
         const { name } = req.body;
         const parentId = req.body.parent_id;
 
+        // check that the provided parent id does exist
+        const isParent = await directoriesModel.findOne({
+            where: {
+                id: parentId
+            }
+        });
+        console.log({ isParent });
+
+        if (!isParent) {
+            return response.status(404).send('parent id does not exist');
+        }
+
         const createdDirectory = await directoriesModel.create({
             name,
             parent_id: parentId
