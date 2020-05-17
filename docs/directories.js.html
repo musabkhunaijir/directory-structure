@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: directories.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: directories.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const Sequelize = require('sequelize');
+const models = require('../models')
+const directoriesModel = models.directories;
+
+/**
+ * GET /api/v1/directories?page_number=&lt;value>
+ * 
+ * @param {number} page_number - the pagination page number (query param)
+ * @return {Array} directories details
+ */
+async function getDirectories(req, response) {
+    try {
+        const pageNumber = req.query.page_number || 0;
+
+        const offset = pageNumber * 10 // 20 is the page size
+
+        const result = await directoriesModel.findAll({
+            limit: 20,
+            offset,
+            include: [{
+                model: models.files,
+                as: 'files'
+            }]
+        });
+
+        return response.status(200).send(result);
+    } catch (error) {
+        return response.status(500).send(error);
+    }
+}
+
+/**
+ * GET /api/v1/directories/search?name=&lt;value>
+ * 
+ * @param {number} page_number - the pagination page number (query param)
+ * @return {Array} directories details
+ */
+async function search(req, response) {
+    try {
+        const pageNumber = req.query.page_number || 0;
+        const { name } = req.query;
+
+        const offset = pageNumber * 10 // 20 is the page size
+
+        const result = await directoriesModel.findAll({
+            limit: 20,
+            offset,
+            where: {
+                name: {
+                    [Sequelize.Op.like]: `%${name}%`
+                }
+            },
+            include: [{
+                model: models.files,
+                as: 'files'
+            }]
+        });
+
+        return response.status(200).send(result);
+    } catch (error) {
+        return response.status(500).send(error);
+    }
+}
+
+/**
+ * GET /api/v1/directories/:id/sub?page_number=&lt;value>
+ * 
+ * @param {number} page_number - the pagination page number (query param)
+ * @param {number} parent_id - directory parent_id (params)
+ * @return {Array} directories details
+ */
+async function getSubDirectories(req, response) {
+    try {
+        const pageNumber = req.query.page_number || 0;
+        const parentId = req.params.parent_id;
+
+        const offset = pageNumber * 10 // 20 is the page size
+
+        const result = await directoriesModel.findAll({
+            limit: 20,
+            offset,
+            where: {
+                parent_id: parentId
+            },
+            include: [{
+                model: models.files,
+                as: 'files'
+            }]
+        });
+
+        return response.status(200).send(result);
+    } catch (error) {
+        return response.status(500).send(error);
+    }
+}
+
+/**
+ * POST /api/v1/directories/parent_dir
+ * 
+ * @param {string} name - directory name 
+ * @return {object} created directory
+ */
+async function addParentDirectory(req, response) {
+    try {
+        const { name } = req.body;
+
+        const createdDirectory = await directoriesModel.create({
+            name
+        });
+
+        return response.status(200).send(createdDirectory);
+    } catch (error) {
+        return response.status(500).send(error);
+    }
+}
+
+/**
+ * POST /api/v1/directories/sub_dir
+ * 
+ * @param {string} name - directory name 
+ * @param {number} parent_id - directory parent_id
+ * @return {object} created directory
+ */
+async function addSubDirectory(req, response) {
+    try {
+        const { name } = req.body;
+        const parentId = req.body.parent_id;
+
+        const createdDirectory = await directoriesModel.create({
+            name,
+            parent_id: parentId
+        });
+
+        return response.status(200).send(createdDirectory);
+    } catch (error) {
+        return response.status(500).send(error);
+    }
+}
+
+/**
+ * DELETE /api/v1/directories/:id
+ * 
+ * @param {number} id - directory id (param parameter)
+ * @return {number} 200 status
+ */
+async function deleteDirectory(req, response) {
+    try {
+        const { id } = req.params;
+        await directoriesModel.destroy({
+            where: { id }
+        });
+
+        return response.status(200).send('deleted!');
+    } catch (error) {
+        return response.status(500).send(error);
+    }
+}
+
+module.exports = { getDirectories, search, getSubDirectories, addParentDirectory, addSubDirectory, deleteDirectory };</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#addParentDirectory">addParentDirectory</a></li><li><a href="global.html#addSubDirectory">addSubDirectory</a></li><li><a href="global.html#deleteDirectory">deleteDirectory</a></li><li><a href="global.html#deleteFile">deleteFile</a></li><li><a href="global.html#getDirectories">getDirectories</a></li><li><a href="global.html#getFiles">getFiles</a></li><li><a href="global.html#getSubDirectories">getSubDirectories</a></li><li><a href="global.html#search">search</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Sun May 17 2020 12:18:58 GMT+0200 (Central Africa Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

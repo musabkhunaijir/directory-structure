@@ -5,7 +5,8 @@
   "scripts": {
     "start": "supervisor ./bin/www",
     "setup": "sequelize db:migrate:undo:all && sequelize db:migrate && sequelize db:seed:all",
-    "//setup": "sequelize db:migrate && npm i"
+    "//setup": "sequelize db:migrate && npm i",
+    "docs": "jsdoc controller --destination ./docs"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
