@@ -10,3 +10,10 @@
 ````
     npm run setup
 ````
+
+# to run the app:
+* needs supervisor to be installed
+
+````
+    npm start
+````
