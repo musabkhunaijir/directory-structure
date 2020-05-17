@@ -2,6 +2,14 @@ const Sequelize = require('sequelize');
 const models = require('../models')
 const directoriesModel = models.directories;
 
+const include = [{
+    model: models.directories,
+    as: 'parent_directory'
+}, {
+    model: models.files,
+    as: 'files'
+}];
+
 /**
  * GET /api/v1/directories?page_number=<value>
  * 
@@ -17,10 +25,7 @@ async function getDirectories(req, response) {
         const result = await directoriesModel.findAll({
             limit: 20,
             offset,
-            include: [{
-                model: models.files,
-                as: 'files'
-            }]
+            include,
         });
 
         return response.status(200).send(result);
@@ -50,10 +55,7 @@ async function search(req, response) {
                     [Sequelize.Op.like]: `%${name}%`
                 }
             },
-            include: [{
-                model: models.files,
-                as: 'files'
-            }]
+            include
         });
 
         return response.status(200).send(result);
@@ -82,10 +84,7 @@ async function getSubDirectories(req, response) {
             where: {
                 parent_id: parentId
             },
-            include: [{
-                model: models.files,
-                as: 'files'
-            }]
+            include
         });
 
         return response.status(200).send(result);
