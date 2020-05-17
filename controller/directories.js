@@ -2,18 +2,54 @@ const models = require('../models')
 const directoriesModel = models.directories;
 
 /**
- * GET /api/v1/directories/
+ * GET /api/v1/directories?page_number=<value>
  * 
- * @param {number} page_number - the pagination page number 
+ * @param {number} page_number - the pagination page number (query param)
  * @return {Array} directories details
  */
 async function getDirectories(req, response) {
-    // TODO:
-    const pageNumber = req.query.page_number;
+    try {
+        const pageNumber = req.query.page_number || 0;
 
-    const result = await directoriesModel.findAll();
+        const offset = pageNumber * 10 // 20 is the page size
 
-    return response.status(200).send(result);
+        const result = await directoriesModel.findAll({
+            limit: 20,
+            offset
+        });
+
+        return response.status(200).send(result);
+    } catch (error) {
+        return response.status(500).send(error);
+    }
+}
+
+/**
+ * GET /api/v1/directories/:id/sub?page_number=<value>
+ * 
+ * @param {number} page_number - the pagination page number (query param)
+ * @param {number} parent_id - directory parent_id (params)
+ * @return {Array} directories details
+ */
+async function getSubDirectories(req, response) {
+    try {
+        const pageNumber = req.query.page_number || 0;
+        const parentId = req.params.parent_id;
+
+        const offset = pageNumber * 10 // 20 is the page size
+
+        const result = await directoriesModel.findAll({
+            limit: 20,
+            offset,
+            where: {
+                parent_id: parentId
+            }
+        });
+
+        return response.status(200).send(result);
+    } catch (error) {
+        return response.status(500).send(error);
+    }
 }
 
 /**
@@ -23,13 +59,17 @@ async function getDirectories(req, response) {
  * @return {object} created directory
  */
 async function addParentDirectory(req, response) {
-    const { name } = req.body;
+    try {
+        const { name } = req.body;
 
-    const createdDirectory = await directoriesModel.create({
-        name
-    });
+        const createdDirectory = await directoriesModel.create({
+            name
+        });
 
-    return response.status(200).send(createdDirectory);
+        return response.status(200).send(createdDirectory);
+    } catch (error) {
+        return response.status(500).send(error);
+    }
 }
 
 /**
@@ -40,15 +80,19 @@ async function addParentDirectory(req, response) {
  * @return {object} created directory
  */
 async function addSubDirectory(req, response) {
-    const { name } = req.body;
-    const parentId = req.body.parent_id;
+    try {
+        const { name } = req.body;
+        const parentId = req.body.parent_id;
 
-    const createdDirectory = await directoriesModel.create({
-        name,
-        parent_id: parentId
-    });
+        const createdDirectory = await directoriesModel.create({
+            name,
+            parent_id: parentId
+        });
 
-    return response.status(200).send(createdDirectory);
+        return response.status(200).send(createdDirectory);
+    } catch (error) {
+        return response.status(500).send(error);
+    }
 }
 
 /**
@@ -58,12 +102,16 @@ async function addSubDirectory(req, response) {
  * @return {number} 200 status
  */
 async function deleteDirectory(req, response) {
-    const { id } = req.params;
-    await directoriesModel.destroy({
-        where: { id }
-    });
+    try {
+        const { id } = req.params;
+        await directoriesModel.destroy({
+            where: { id }
+        });
 
-    return response.status(200).send('deleted!');
+        return response.status(200).send('deleted!');
+    } catch (error) {
+        return response.status(500).send(error);
+    }
 }
 
-module.exports = { getDirectories, addParentDirectory, addSubDirectory, deleteDirectory };
+module.exports = { getDirectories, getSubDirectories, addParentDirectory, addSubDirectory, deleteDirectory };
