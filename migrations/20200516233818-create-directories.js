@@ -14,7 +14,11 @@ module.exports = {
         // unique: true
       },
       parent_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'directories',
+          key: 'id',
+        }
       },
       createdAt: {
         allowNull: false,
