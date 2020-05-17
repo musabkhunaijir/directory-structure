@@ -4,6 +4,7 @@ const router = express.Router();
 
 router.get('/', directoriesController.getDirectories);
 router.get('/:parent_id/sub', directoriesController.getSubDirectories);
+router.get('/search', directoriesController.search);
 
 router.post('/parent_dir', directoriesController.addParentDirectory);
 router.post('/sub_dir', directoriesController.addSubDirectory);

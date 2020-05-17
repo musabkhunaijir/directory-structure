@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('directories', {
+    return queryInterface.createTable('files', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -9,11 +9,9 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       name: {
-        allowNull: false,
-        type: Sequelize.STRING,
-        // unique: true
+        type: Sequelize.STRING
       },
-      parent_id: {
+      directory_id: {
         type: Sequelize.INTEGER,
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
@@ -33,6 +31,6 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('directories');
+    return queryInterface.dropTable('files');
   }
 };

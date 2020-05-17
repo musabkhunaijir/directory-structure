@@ -1,3 +1,4 @@
+const Sequelize = require('sequelize');
 const models = require('../models')
 const directoriesModel = models.directories;
 
@@ -15,7 +16,44 @@ async function getDirectories(req, response) {
 
         const result = await directoriesModel.findAll({
             limit: 20,
-            offset
+            offset,
+            include: [{
+                model: models.files,
+                as: 'files'
+            }]
+        });
+
+        return response.status(200).send(result);
+    } catch (error) {
+        return response.status(500).send(error);
+    }
+}
+
+/**
+ * GET /api/v1/directories/search?name=<value>
+ * 
+ * @param {number} page_number - the pagination page number (query param)
+ * @return {Array} directories details
+ */
+async function search(req, response) {
+    try {
+        const pageNumber = req.query.page_number || 0;
+        const { name } = req.query;
+
+        const offset = pageNumber * 10 // 20 is the page size
+
+        const result = await directoriesModel.findAll({
+            limit: 20,
+            offset,
+            where: {
+                name: {
+                    [Sequelize.Op.like]: `%${name}%`
+                }
+            },
+            include: [{
+                model: models.files,
+                as: 'files'
+            }]
         });
 
         return response.status(200).send(result);
@@ -43,7 +81,11 @@ async function getSubDirectories(req, response) {
             offset,
             where: {
                 parent_id: parentId
-            }
+            },
+            include: [{
+                model: models.files,
+                as: 'files'
+            }]
         });
 
         return response.status(200).send(result);
@@ -114,4 +156,4 @@ async function deleteDirectory(req, response) {
     }
 }
 
-module.exports = { getDirectories, getSubDirectories, addParentDirectory, addSubDirectory, deleteDirectory };
+module.exports = { getDirectories, search, getSubDirectories, addParentDirectory, addSubDirectory, deleteDirectory };

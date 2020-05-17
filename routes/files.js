@@ -1,9 +1,10 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const filesController = require('../controller/files');
+const router = express.Router();
 
-/* GET users listing. */
-router.get('/', function (req, res, next) {
-  res.send('respond with a resource');
-});
+router.get('/', filesController.getFiles);
+
+router.delete('/:id', filesController.deleteFile);
+
 
 module.exports = router;
